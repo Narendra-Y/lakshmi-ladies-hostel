@@ -1,6 +1,6 @@
 {
-  "buildCommand": "pnpm --filter @workspace/hostel-app run build",
-  "outputDirectory": "artifacts/hostel-app/dist/public",
+  "buildCommand": "pnpm --filter @workspace/hostel-app run build && rm -rf public && cp -r artifacts/hostel-app/dist/public public",
+  "outputDirectory": "public",
   "rewrites": [
     {
       "source": "/api/:match*",
