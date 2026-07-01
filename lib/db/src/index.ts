@@ -4,13 +4,9 @@ import * as schema from "./schema";
 
 const { Pool } = pg;
 
-if (!process.env.DATABASE_URL) {
-  throw new Error(
-    "DATABASE_URL must be set. Did you forget to provision a database?",
-  );
-}
+const dbUrl = process.env.DATABASE_URL || "postgresql://postgres.drdwrkpbynivpxumqpkj:NarendraYadav%40123@aws-1-ap-northeast-1.pooler.supabase.com:5432/postgres";
 
-export const pool = new Pool({ connectionString: process.env.DATABASE_URL });
+export const pool = new Pool({ connectionString: dbUrl });
 export const db = drizzle(pool, { schema });
 
 export * from "./schema";
