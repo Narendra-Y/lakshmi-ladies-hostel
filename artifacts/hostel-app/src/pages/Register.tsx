@@ -126,10 +126,8 @@ function FileUploadField({
     formData.append("file", file);
 
     try {
-      const res = await fetch("/api/uploads", { method: "POST", body: formData });
-      if (!res.ok) throw new Error("Upload failed");
-      const data = await res.json();
-      onUpload(data.url);
+      const res = await customFetch<{ fileUrl: string }>("/api/uploads", { method: "POST", body: formData });
+      onUpload(res.fileUrl);
     } catch {
       setPreview(null);
       setFileName(null);
