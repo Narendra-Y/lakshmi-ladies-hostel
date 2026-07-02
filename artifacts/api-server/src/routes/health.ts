@@ -5,8 +5,7 @@ import { db, adminsTable } from "@workspace/db";
 const router: IRouter = Router();
 
 router.get("/healthz", (_req, res) => {
-  const data = HealthCheckResponse.parse({ status: "ok" });
-  res.json(data);
+  res.json({ status: "ok", version: "66d313a" });
 });
 
 router.get("/test-db", async (_req, res) => {
