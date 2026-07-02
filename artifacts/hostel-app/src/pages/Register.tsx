@@ -126,8 +126,8 @@ function FileUploadField({
     formData.append("file", file);
 
     try {
-      const res = await customFetch<{ fileUrl: string }>("/api/uploads", { method: "POST", body: formData });
-      onUpload(res.fileUrl);
+      const res = await customFetch<{ url: string }>("/api/uploads", { method: "POST", body: formData });
+      onUpload(res.url);
     } catch {
       setPreview(null);
       setFileName(null);
