@@ -2,6 +2,14 @@ import { drizzle } from "drizzle-orm/node-postgres";
 import pg from "pg";
 import * as schema from "./schema";
 
+// Clear environment variables that pg library implicitly reads and overrides connectionString
+delete process.env.PGUSER;
+delete process.env.PGPASSWORD;
+delete process.env.PGHOST;
+delete process.env.PGPORT;
+delete process.env.PGDATABASE;
+delete process.env.PGSSLMODE;
+
 const { Pool } = pg;
 
 let dbUrl = process.env.DATABASE_URL;
