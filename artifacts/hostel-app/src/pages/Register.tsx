@@ -9,7 +9,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
-import { useCreateRegistration } from "@workspace/api-client-react";
+import { useCreateRegistration, customFetch } from "@workspace/api-client-react";
 import {
   ArrowLeft, Upload, CheckCircle, X, Loader2, User, Users, MapPin,
   FileImage, ChevronRight, ScrollText, Clock, Zap, Ban, BookOpen, Lock,
@@ -128,9 +128,11 @@ function FileUploadField({
     try {
       const res = await customFetch<{ url: string }>("/api/uploads", { method: "POST", body: formData });
       onUpload(res.url);
-    } catch {
+    } catch (err) {
+      console.error("Upload failed:", err);
       setPreview(null);
       setFileName(null);
+      onUpload("");
     } finally {
       setUploading(false);
     }

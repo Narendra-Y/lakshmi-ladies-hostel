@@ -22,7 +22,13 @@ if (dbUrl.includes("NarendraYadav@123")) {
   dbUrl = dbUrl.replace("NarendraYadav@123", "NarendraYadav%40123");
 }
 
-export const pool = new Pool({ connectionString: dbUrl });
+export const pool = new Pool({
+  connectionString: dbUrl,
+  ssl: { rejectUnauthorized: false },
+  max: 10,
+  idleTimeoutMillis: 30000,
+  connectionTimeoutMillis: 10000,
+});
 export const db = drizzle(pool, { schema });
 
 export * from "./schema";

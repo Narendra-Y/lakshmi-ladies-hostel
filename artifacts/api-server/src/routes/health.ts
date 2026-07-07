@@ -1,6 +1,6 @@
 import { Router, type IRouter } from "express";
 import { HealthCheckResponse } from "@workspace/api-zod";
-import { db, adminsTable, dbUrl } from "@workspace/db";
+import { db, adminsTable, dbUrl, pool } from "@workspace/db";
 
 const router: IRouter = Router();
 
@@ -10,11 +10,9 @@ router.get("/healthz", (_req, res) => {
 
 router.get("/test-db", async (_req, res) => {
   const mask = (str: string) => str ? str.replace(/:([^:@]+)@/, ":****@") : "";
-  const pg = require('pg');
-  const testPool = new pg.Pool({ connectionString: dbUrl });
   try {
-    const testRes = await testPool.query('SELECT NOW()');
-    res.json({ status: "success", pg: testRes.rows[0], urlUsed: mask(dbUrl) });
+    const testRes = await pool.query('SELECT NOW()');
+    res.json({ status: "success", pg: testRes.rows[0], urlUsed: mask(dbUrl!), nodeVersion: process.version });
   } catch (err) {
     const pgErr = err as any;
     res.status(500).json({ 
@@ -23,11 +21,10 @@ router.get("/test-db", async (_req, res) => {
       code: pgErr.code,
       detail: pgErr.detail,
       originalError: pgErr.originalError?.message || pgErr.cause?.message || pgErr.message,
-      urlUsed: mask(dbUrl),
-      envDatabaseUrl: mask(process.env.DATABASE_URL || "")
+      urlUsed: mask(dbUrl!),
+      envDatabaseUrl: mask(process.env.DATABASE_URL || ""),
+      nodeVersion: process.version,
     });
-  } finally {
-    await testPool.end();
   }
 });
 
