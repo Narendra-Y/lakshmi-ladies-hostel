@@ -12,18 +12,25 @@ delete process.env.PGSSLMODE;
 
 const { Pool } = pg;
 
-export let dbUrl = process.env.DATABASE_URL;
+// Use explicit connection parameters to avoid URL-encoding issues
+// with the @ character in the password (NarendraYadav@123).
+// Using connectionString with @ in the password breaks URL parsing
+// on some deployments (e.g. Render) even with %40 encoding.
+const DB_USER = "postgres.drdwrkpbynivpxumqpkj";
+const DB_PASSWORD = "NarendraYadav@123";
+const DB_HOST = "aws-1-ap-northeast-1.pooler.supabase.com";
+const DB_PORT = 5432;
+const DB_NAME = "postgres";
 
-if (!dbUrl || !dbUrl.includes("drdwrkpbynivpxumqpkj")) {
-  dbUrl = "postgresql://postgres.drdwrkpbynivpxumqpkj:NarendraYadav%40123@aws-1-ap-northeast-1.pooler.supabase.com:5432/postgres";
-}
-
-if (dbUrl.includes("NarendraYadav@123")) {
-  dbUrl = dbUrl.replace("NarendraYadav@123", "NarendraYadav%40123");
-}
+// For display/debugging only (password masked)
+export const dbUrl = `postgresql://${DB_USER}:****@${DB_HOST}:${DB_PORT}/${DB_NAME}`;
 
 export const pool = new Pool({
-  connectionString: dbUrl,
+  user: DB_USER,
+  password: DB_PASSWORD,
+  host: DB_HOST,
+  port: DB_PORT,
+  database: DB_NAME,
   ssl: { rejectUnauthorized: false },
   max: 10,
   idleTimeoutMillis: 30000,
