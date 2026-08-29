@@ -27,6 +27,7 @@ import {
 import { getStoredTheme, applyTheme, type Theme } from "../App";
 import RoomsTab from "../components/RoomsTab";
 import RemindersTab from "../components/RemindersTab";
+import { resolveUploadUrl } from "@/lib/utils";
 
 const STATUS_COLORS: Record<string, string> = {
   pending: "bg-amber-100 text-amber-800 border-amber-200 dark:bg-amber-900/30 dark:text-amber-300 dark:border-amber-800",
