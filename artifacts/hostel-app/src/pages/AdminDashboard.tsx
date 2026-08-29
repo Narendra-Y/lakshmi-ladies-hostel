@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from "react";
-import { useLocation, Link } from "wouter";
+import { useLocation, Link, Redirect } from "wouter";
 import { useQueryClient } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -166,12 +166,21 @@ export default function AdminDashboard() {
     limit: 15,
   };
 
-  const { data: regs, isLoading: regsLoading } = useListRegistrations(params, {
+  const { data: regs, isLoading: regsLoading, error: regsError } = useListRegistrations(params, {
     query: { queryKey: getListRegistrationsQueryKey(params), enabled: isAuthed },
   });
-  const { data: stats, isLoading: statsLoading } = useGetRegistrationStats({
+  const { data: stats, isLoading: statsLoading, error: statsError } = useGetRegistrationStats({
     query: { queryKey: getGetRegistrationStatsQueryKey(), enabled: isAuthed, refetchInterval: 30000 },
   });
+
+  // If token is invalid or expired (401), clear token and redirect to login
+  useEffect(() => {
+    const err = (regsError || statsError) as any;
+    if (err && (err.status === 401 || err.status === 403)) {
+      localStorage.removeItem("hostel_admin_token");
+      setLocation("/admin/login");
+    }
+  }, [regsError, statsError, setLocation]);
 
   // Notification: detect new registrations while admin is on dashboard
   useEffect(() => {
@@ -294,7 +303,7 @@ export default function AdminDashboard() {
     a.click();
   };
 
-  if (!isAuthed) return null;
+  if (!isAuthed) return <Redirect to="/admin/login" />;
 
   return (
     <div className="min-h-screen bg-background">
