@@ -16,9 +16,9 @@ const { Pool } = pg;
 // with the @ character in the password (NarendraYadav@123).
 // Using connectionString with @ in the password breaks URL parsing
 // on some deployments (e.g. Render) even with %40 encoding.
-const DB_USER = "postgres.drdwrkpbynivpxumqpkj";
-const DB_PASSWORD = "NarendraYadav@123";
-const DB_HOST = "aws-1-ap-northeast-1.pooler.supabase.com";
+const DB_USER = "postgres.wbcbtubkfpsnnjnrhlcg";
+const DB_PASSWORD = "Narendra@#1122";
+const DB_HOST = "aws-0-ap-southeast-1.pooler.supabase.com";
 const DB_PORT = 5432;
 const DB_NAME = "postgres";
 
