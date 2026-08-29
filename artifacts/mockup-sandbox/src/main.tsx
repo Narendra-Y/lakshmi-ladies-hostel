@@ -5,7 +5,7 @@ import "./index.css";
 
 // If deployed (not localhost), use the Render API URL
 if (window.location.hostname !== "localhost") {
-  setBaseUrl("https://lakshmi-hostel-api.onrender.com");
+  setBaseUrl("https://lakshmi-ladies-hostel.onrender.com");
 }
 
 createRoot(document.getElementById("root")!).render(<App />);
