@@ -511,6 +511,19 @@ export default function AdminDashboard() {
                 </tbody>
               </table>
             </div>
+          ) : regsError ? (
+            <div className="text-center py-16 bg-card rounded-2xl p-8 border border-card-border">
+              <div className="w-12 h-12 rounded-full bg-amber-500/10 flex items-center justify-center mx-auto mb-3">
+                <AlertTriangle className="w-6 h-6 text-amber-500" />
+              </div>
+              <p className="font-semibold text-foreground text-base mb-1">Server is connecting...</p>
+              <p className="text-sm text-muted-foreground max-w-sm mx-auto mb-4">
+                The server may be waking up from sleep. Click retry below to reload data.
+              </p>
+              <Button onClick={() => invalidate()} size="sm" className="gap-2">
+                <RefreshCw className="w-4 h-4" /> Retry Connection
+              </Button>
+            </div>
           ) : !regs?.data?.length ? (
             <div className="text-center py-20 text-muted-foreground">
               <div className="w-14 h-14 rounded-2xl bg-muted flex items-center justify-center mx-auto mb-4">

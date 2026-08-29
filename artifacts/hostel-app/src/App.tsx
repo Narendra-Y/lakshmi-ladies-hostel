@@ -14,7 +14,11 @@ setAuthTokenGetter(() => localStorage.getItem("hostel_admin_token"));
 
 const queryClient = new QueryClient({
   defaultOptions: {
-    queries: { retry: 1, staleTime: 30000 },
+    queries: {
+      retry: 3,
+      retryDelay: (attempt) => Math.min(1000 * 2 ** attempt, 8000),
+      staleTime: 30000,
+    },
   },
 });
 
