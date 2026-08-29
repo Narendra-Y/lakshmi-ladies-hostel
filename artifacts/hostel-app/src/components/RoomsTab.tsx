@@ -18,6 +18,7 @@ import {
   getListRegistrationsQueryKey,
 } from "@workspace/api-client-react";
 import type { RoomWithBeds, BedWithTenant } from "@workspace/api-client-react";
+import { resolveUploadUrl } from "@/lib/utils";
 import {
   Building2, BedDouble, Users, BarChart3, Plus, Search,
   UserCheck, ArrowRightLeft, DoorOpen, Loader2, RefreshCw,
@@ -385,7 +386,7 @@ export default function RoomsTab() {
                     >
                       <div className="w-9 h-9 rounded-full bg-primary/10 flex items-center justify-center shrink-0">
                         {tenant.photoUrl ? (
-                          <img src={tenant.photoUrl} alt="" className="w-9 h-9 rounded-full object-cover" />
+                          <img src={resolveUploadUrl(tenant.photoUrl)} alt="" className="w-9 h-9 rounded-full object-cover" />
                         ) : (
                           <span className="text-primary text-sm font-semibold">{tenant.fullName[0]}</span>
                         )}

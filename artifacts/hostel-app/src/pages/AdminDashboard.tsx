@@ -92,64 +92,6 @@ function StatCard({ label, value, icon: Icon, color, isLoading }: {
   );
 }
 
-function RegistrationDetail({ reg }: { reg: Registration }) {
-  const rows: { icon: React.ElementType; label: string; value: string | null | undefined }[] = [
-    { icon: Phone, label: "Mobile", value: reg.mobileNumber },
-    { icon: Calendar, label: "Date of Birth", value: reg.dateOfBirth },
-    { icon: Mail, label: "Email", value: reg.email },
-    { icon: User, label: "Gender", value: reg.gender },
-    { icon: Briefcase, label: "Profession", value: reg.profession },
-    { icon: Shield, label: "Guardian", value: reg.guardianName },
-    { icon: Phone, label: "Guardian Mobile", value: reg.guardianMobile },
-    { icon: MapPin, label: "Address", value: reg.address },
-    { icon: Calendar, label: "Registered", value: new Date(reg.createdAt).toLocaleDateString("en-IN", { day: "2-digit", month: "short", year: "numeric" }) },
-  ];
-
-  return (
-    <div className="space-y-4">
-      {reg.photoUrl && (
-        <div className="flex justify-center">
-          <img src={reg.photoUrl} alt="Photo" className="w-24 h-24 rounded-full object-cover border-4 border-primary/20 shadow-md" />
-        </div>
-      )}
-      <div className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold border mx-auto block text-center w-fit ${STATUS_COLORS[reg.status]}`}>
-        {reg.status.toUpperCase()}
-      </div>
-      <div className="space-y-2">
-        {rows.map(({ icon: Icon, label, value }) =>
-          value ? (
-            <div key={label} className="flex gap-3 items-start py-2 border-b border-border/50 last:border-0">
-              <div className="w-7 h-7 rounded-lg bg-muted flex items-center justify-center shrink-0 mt-0.5">
-                <Icon className="w-3.5 h-3.5 text-muted-foreground" />
-              </div>
-              <div className="min-w-0">
-                <p className="text-xs text-muted-foreground">{label}</p>
-                <p className="text-sm text-foreground font-medium capitalize break-words">{value}</p>
-              </div>
-            </div>
-          ) : null
-        )}
-      </div>
-      {reg.notes && (
-        <div className="bg-muted/50 rounded-xl p-3">
-          <p className="text-xs text-muted-foreground mb-1">Notes</p>
-          <p className="text-sm text-foreground">{reg.notes}</p>
-        </div>
-      )}
-      {reg.idProofUrl && (
-        <a
-          href={reg.idProofUrl}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="flex items-center gap-2 text-primary text-sm underline underline-offset-2"
-        >
-          <Eye className="w-4 h-4" /> View ID Proof
-        </a>
-      )}
-    </div>
-  );
-}
-
 interface ConfirmDialogProps {
   open: boolean;
   title: string;
@@ -589,7 +531,7 @@ export default function AdminDashboard() {
                       <td className="px-4 py-3">
                         <div className="flex items-center gap-2.5">
                           {reg.photoUrl ? (
-                            <img src={reg.photoUrl} alt="" className="w-8 h-8 rounded-full object-cover shrink-0 ring-2 ring-border" />
+                            <img src={resolveUploadUrl(reg.photoUrl)} alt="" className="w-8 h-8 rounded-full object-cover shrink-0 ring-2 ring-border" />
                           ) : (
                             <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center shrink-0">
                               <span className="text-primary text-xs font-semibold">{reg.fullName[0]?.toUpperCase()}</span>
@@ -679,7 +621,7 @@ export default function AdminDashboard() {
               <div key={reg.id} className="bg-card border border-card-border rounded-xl p-4 shadow-sm" data-testid={`row-registration-${reg.id}`}>
                 <div className="flex items-start gap-3">
                   {reg.photoUrl ? (
-                    <img src={reg.photoUrl} alt="" className="w-11 h-11 rounded-full object-cover shrink-0 ring-2 ring-border" />
+                    <img src={resolveUploadUrl(reg.photoUrl)} alt="" className="w-11 h-11 rounded-full object-cover shrink-0 ring-2 ring-border" />
                   ) : (
                     <div className="w-11 h-11 rounded-full bg-primary/10 flex items-center justify-center shrink-0">
                       <span className="text-primary text-sm font-semibold">{reg.fullName[0]?.toUpperCase()}</span>
