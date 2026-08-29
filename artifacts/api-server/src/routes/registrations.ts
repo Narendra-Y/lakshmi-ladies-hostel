@@ -22,21 +22,29 @@ import { requireAuth, type AuthRequest } from "../middlewares/auth";
 const router: IRouter = Router();
 
 router.post("/registrations", async (req, res): Promise<void> => {
+  // Sanitize empty strings for optional fields
+  if (req.body.email === "") delete req.body.email;
+  if (req.body.notes === "") delete req.body.notes;
+  if (req.body.photoUrl === "") delete req.body.photoUrl;
+  if (req.body.idProofUrl === "") delete req.body.idProofUrl;
+
   const parsed = CreateRegistrationBody.safeParse(req.body);
   if (!parsed.success) {
-    res.status(400).json({ error: parsed.error.message });
+    const errorMsg = parsed.error.issues.map((i) => `${i.path.join(".")}: ${i.message}`).join(", ");
+    res.status(400).json({ error: errorMsg });
     return;
   }
 
-  const existing = await db
-    .select({ id: registrationsTable.id })
-    .from(registrationsTable)
-    .where(eq(registrationsTable.mobileNumber, parsed.data.mobileNumber));
+  try {
+    const existing = await db
+      .select({ id: registrationsTable.id })
+      .from(registrationsTable)
+      .where(eq(registrationsTable.mobileNumber, parsed.data.mobileNumber));
 
-  if (existing.length > 0) {
-    res.status(409).json({ error: "This phone number is already registered." });
-    return;
-  }
+    if (existing.length > 0) {
+      res.status(409).json({ error: "This mobile number is already registered with us." });
+      return;
+    }
 
   const dob = parsed.data.dateOfBirth instanceof Date
     ? parsed.data.dateOfBirth.toISOString().split("T")[0]
@@ -60,7 +68,11 @@ router.post("/registrations", async (req, res): Promise<void> => {
     })
     .returning();
 
-  res.status(201).json(GetRegistrationResponse.parse(reg));
+    res.status(201).json(GetRegistrationResponse.parse(reg));
+  } catch (err: any) {
+    console.error("Error creating registration:", err);
+    res.status(500).json({ error: err.message || "Database error while saving registration" });
+  }
 });
 
 router.get("/registrations/stats", requireAuth, async (_req: AuthRequest, res): Promise<void> => {

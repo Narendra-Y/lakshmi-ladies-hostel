@@ -274,31 +274,24 @@ export default function Register() {
       {
         data: {
           ...data,
-          email: data.email,
-          notes: data.notes || undefined,
-          photoUrl: photoUrl,
-          idProofUrl: idProofUrl,
+          email: data.email ? data.email.trim() : undefined,
+          notes: data.notes ? data.notes.trim() : undefined,
+          photoUrl: photoUrl || undefined,
+          idProofUrl: idProofUrl || undefined,
         },
       },
       {
         onSuccess: () => {
           setSubmitted(true);
         },
-        onError: (error: unknown) => {
-          const apiError = error as { data?: { error?: string }; status?: number };
-          if (apiError?.status === 409) {
-            toast({
-              title: "Already registered",
-              description: "This phone number is already registered with us.",
-              variant: "destructive",
-            });
-          } else {
-            toast({
-              title: "Registration failed",
-              description: apiError?.data?.error ?? "Please try again.",
-              variant: "destructive",
-            });
-          }
+        onError: (error: any) => {
+          const errMsg = error?.data?.error || error?.message || "Please check your inputs and try again.";
+          const is409 = error?.status === 409 || errMsg.toLowerCase().includes("already registered");
+          toast({
+            title: is409 ? "Already Registered" : "Registration Failed",
+            description: is409 ? "This phone number is already registered with us." : errMsg,
+            variant: "destructive",
+          });
         },
       }
     );
