@@ -34,6 +34,64 @@ const STATUS_COLORS: Record<string, string> = {
   rejected: "bg-red-100 text-red-800 border-red-200 dark:bg-red-900/30 dark:text-red-300 dark:border-red-800",
 };
 
+function RegistrationDetail({ reg }: { reg: Registration }) {
+  const rows: { icon: React.ElementType; label: string; value: string | null | undefined }[] = [
+    { icon: Phone, label: "Mobile", value: reg.mobileNumber },
+    { icon: Calendar, label: "Date of Birth", value: reg.dateOfBirth },
+    { icon: Mail, label: "Email", value: reg.email },
+    { icon: User, label: "Gender", value: reg.gender },
+    { icon: Briefcase, label: "Profession", value: reg.profession },
+    { icon: Shield, label: "Guardian", value: reg.guardianName },
+    { icon: Phone, label: "Guardian Mobile", value: reg.guardianMobile },
+    { icon: MapPin, label: "Address", value: reg.address },
+    { icon: Calendar, label: "Registered", value: new Date(reg.createdAt).toLocaleDateString("en-IN", { day: "2-digit", month: "short", year: "numeric" }) },
+  ];
+
+  return (
+    <div className="space-y-4">
+      {reg.photoUrl && (
+        <div className="flex justify-center">
+          <img src={resolveUploadUrl(reg.photoUrl)} alt="Photo" className="w-24 h-24 rounded-full object-cover border-4 border-primary/20 shadow-md" />
+        </div>
+      )}
+      <div className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold border mx-auto block text-center w-fit ${STATUS_COLORS[reg.status]}`}>
+        {reg.status.toUpperCase()}
+      </div>
+      <div className="space-y-2">
+        {rows.map(({ icon: Icon, label, value }) =>
+          value ? (
+            <div key={label} className="flex gap-3 items-start py-2 border-b border-border/50 last:border-0">
+              <div className="w-7 h-7 rounded-lg bg-muted flex items-center justify-center shrink-0 mt-0.5">
+                <Icon className="w-3.5 h-3.5 text-muted-foreground" />
+              </div>
+              <div className="min-w-0">
+                <p className="text-xs text-muted-foreground">{label}</p>
+                <p className="text-sm text-foreground font-medium capitalize break-words">{value}</p>
+              </div>
+            </div>
+          ) : null
+        )}
+      </div>
+      {reg.notes && (
+        <div className="bg-muted/50 rounded-xl p-3">
+          <p className="text-xs text-muted-foreground mb-1">Notes</p>
+          <p className="text-sm text-foreground">{reg.notes}</p>
+        </div>
+      )}
+      {reg.idProofUrl && (
+        <a
+          href={resolveUploadUrl(reg.idProofUrl)}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="flex items-center gap-2 text-primary text-sm underline underline-offset-2"
+        >
+          <Eye className="w-4 h-4" /> View ID Proof
+        </a>
+      )}
+    </div>
+  );
+}
+
 function useAdminGuard() {
   const [, setLocation] = useLocation();
   const token = localStorage.getItem("hostel_admin_token");
