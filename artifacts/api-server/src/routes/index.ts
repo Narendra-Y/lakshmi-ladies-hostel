@@ -5,6 +5,7 @@ import registrationsRouter from "./registrations";
 import uploadsRouter from "./uploads";
 import qrRouter from "./qr";
 import roomsRouter from "./rooms";
+import remindersRouter from "./reminders";
 
 const router: IRouter = Router();
 
@@ -14,5 +15,6 @@ router.use(registrationsRouter);
 router.use(uploadsRouter);
 router.use(qrRouter);
 router.use(roomsRouter);
+router.use(remindersRouter);
 
 export default router;
