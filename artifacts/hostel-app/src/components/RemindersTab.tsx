@@ -14,8 +14,17 @@ import {
   CalendarClock, Phone, Mail, CheckCircle2, AlertTriangle, Clock, IndentIncrease,
   Loader2, CalendarCheck,
 } from "lucide-react";
+import WhatsAppReminderDialog, { WhatsAppIcon } from "./WhatsAppReminderDialog";
 
-function ReminderCard({ item, onMarkPaid }: { item: ReminderItem; onMarkPaid: (id: number) => void }) {
+function ReminderCard({
+  item,
+  onMarkPaid,
+  onWhatsAppReminder,
+}: {
+  item: ReminderItem;
+  onMarkPaid: (id: number) => void;
+  onWhatsAppReminder: (item: ReminderItem) => void;
+}) {
   const isOverdue = item.daysUntilDue < 0;
   const isToday = item.daysUntilDue === 0;
 
@@ -75,15 +84,25 @@ function ReminderCard({ item, onMarkPaid }: { item: ReminderItem; onMarkPaid: (i
             )}
           </div>
         </div>
-        <Button
-          size="sm"
-          variant={item.paymentStatus === "paid" ? "outline" : "default"}
-          className="shrink-0 rounded-lg text-xs"
-          onClick={() => onMarkPaid(item.id)}
-        >
-          <CheckCircle2 className="w-3.5 h-3.5 mr-1" />
-          Mark Paid
-        </Button>
+        <div className="flex items-center gap-2 shrink-0 flex-wrap sm:flex-nowrap justify-end">
+          <Button
+            size="sm"
+            onClick={() => onWhatsAppReminder(item)}
+            className="rounded-lg text-xs bg-[#25D366] hover:bg-[#20bd5a] text-white gap-1.5 shadow-sm"
+          >
+            <WhatsAppIcon className="w-3.5 h-3.5 fill-white" />
+            <span className="hidden sm:inline">WhatsApp</span> Reminder
+          </Button>
+          <Button
+            size="sm"
+            variant={item.paymentStatus === "paid" ? "outline" : "default"}
+            className="rounded-lg text-xs"
+            onClick={() => onMarkPaid(item.id)}
+          >
+            <CheckCircle2 className="w-3.5 h-3.5 mr-1" />
+            Mark Paid
+          </Button>
+        </div>
       </div>
     </div>
   );
@@ -92,6 +111,7 @@ function ReminderCard({ item, onMarkPaid }: { item: ReminderItem; onMarkPaid: (i
 export default function RemindersTab() {
   const { toast } = useToast();
   const queryClient = useQueryClient();
+  const [selectedTenantForWa, setSelectedTenantForWa] = useState<ReminderItem | null>(null);
 
   const { data: reminders, isLoading } = useGetPaymentReminders({
     query: { queryKey: getGetPaymentRemindersQueryKey(), refetchInterval: 60000 },
@@ -158,7 +178,12 @@ export default function RemindersTab() {
           </div>
           <div className="space-y-3">
             {reminders!.today.map((item) => (
-              <ReminderCard key={item.id} item={item} onMarkPaid={handleMarkPaid} />
+              <ReminderCard
+                key={item.id}
+                item={item}
+                onMarkPaid={handleMarkPaid}
+                onWhatsAppReminder={(it) => setSelectedTenantForWa(it)}
+              />
             ))}
           </div>
         </div>
@@ -178,7 +203,12 @@ export default function RemindersTab() {
           </div>
           <div className="space-y-3">
             {reminders!.overdue.map((item) => (
-              <ReminderCard key={item.id} item={item} onMarkPaid={handleMarkPaid} />
+              <ReminderCard
+                key={item.id}
+                item={item}
+                onMarkPaid={handleMarkPaid}
+                onWhatsAppReminder={(it) => setSelectedTenantForWa(it)}
+              />
             ))}
           </div>
         </div>
@@ -198,11 +228,23 @@ export default function RemindersTab() {
           </div>
           <div className="space-y-3">
             {reminders!.upcoming.map((item) => (
-              <ReminderCard key={item.id} item={item} onMarkPaid={handleMarkPaid} />
+              <ReminderCard
+                key={item.id}
+                item={item}
+                onMarkPaid={handleMarkPaid}
+                onWhatsAppReminder={(it) => setSelectedTenantForWa(it)}
+              />
             ))}
           </div>
         </div>
       )}
+
+      {/* WhatsApp Reminder Dialog */}
+      <WhatsAppReminderDialog
+        open={!!selectedTenantForWa}
+        onOpenChange={(open) => !open && setSelectedTenantForWa(null)}
+        tenant={selectedTenantForWa}
+      />
     </div>
   );
 }

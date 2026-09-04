@@ -19,6 +19,7 @@ import {
 } from "@workspace/api-client-react";
 import type { RoomWithBeds, BedWithTenant } from "@workspace/api-client-react";
 import { resolveUploadUrl } from "@/lib/utils";
+import WhatsAppReminderDialog, { WhatsAppIcon } from "./WhatsAppReminderDialog";
 import {
   Building2, BedDouble, Users, BarChart3, Plus, Search,
   UserCheck, ArrowRightLeft, DoorOpen, Loader2, RefreshCw,
@@ -142,6 +143,7 @@ export default function RoomsTab() {
   const [tenantSearch, setTenantSearch] = useState("");
   const [newRoomNumber, setNewRoomNumber] = useState("");
   const [newTotalBeds, setNewTotalBeds] = useState("");
+  const [waTenantTarget, setWaTenantTarget] = useState<{ fullName: string; mobileNumber: string } | null>(null);
 
   const invalidate = () => {
     queryClient.invalidateQueries({ queryKey: getListRoomsQueryKey() });
@@ -452,6 +454,19 @@ export default function RoomsTab() {
               {!showTransfer ? (
                 <div className="space-y-2">
                   <Button
+                    className="w-full rounded-xl bg-[#25D366] hover:bg-[#20bd5a] text-white gap-2 font-medium"
+                    onClick={() => {
+                      if (bedTarget?.tenant) {
+                        setWaTenantTarget({
+                          fullName: bedTarget.tenant.fullName,
+                          mobileNumber: bedTarget.tenant.mobileNumber,
+                        });
+                      }
+                    }}
+                  >
+                    <WhatsAppIcon className="w-4 h-4 fill-white" /> Send WhatsApp Due Reminder
+                  </Button>
+                  <Button
                     variant="outline"
                     className="w-full rounded-xl border-red-200 text-red-600 hover:bg-red-50 hover:border-red-300"
                     onClick={handleVacate}
@@ -561,6 +576,13 @@ export default function RoomsTab() {
           </div>
         </DialogContent>
       </Dialog>
+
+      {/* WhatsApp Reminder Dialog */}
+      <WhatsAppReminderDialog
+        open={!!waTenantTarget}
+        onOpenChange={(o) => !o && setWaTenantTarget(null)}
+        tenant={waTenantTarget}
+      />
     </div>
   );
 }

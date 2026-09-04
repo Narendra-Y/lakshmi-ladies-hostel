@@ -28,6 +28,7 @@ import { getStoredTheme, applyTheme, type Theme } from "../App";
 import RoomsTab from "../components/RoomsTab";
 import RemindersTab from "../components/RemindersTab";
 import { resolveUploadUrl } from "@/lib/utils";
+import WhatsAppReminderDialog, { WhatsAppIcon } from "../components/WhatsAppReminderDialog";
 
 const STATUS_COLORS: Record<string, string> = {
   pending: "bg-amber-100 text-amber-800 border-amber-200 dark:bg-amber-900/30 dark:text-amber-300 dark:border-amber-800",
@@ -202,6 +203,7 @@ export default function AdminDashboard() {
   const [statusFilter, setStatusFilter] = useState("all");
   const [page, setPage] = useState(1);
   const [selectedReg, setSelectedReg] = useState<Registration | null>(null);
+  const [waReminderTarget, setWaReminderTarget] = useState<Registration | null>(null);
   const [showQr, setShowQr] = useState(false);
   const [theme, setTheme] = useState<Theme>(getStoredTheme);
   const [deleteTarget, setDeleteTarget] = useState<{ id: number; name: string } | null>(null);
@@ -633,6 +635,14 @@ export default function AdminDashboard() {
                       </td>
                       <td className="px-4 py-3">
                         <div className="flex items-center justify-end gap-1 opacity-60 group-hover:opacity-100 transition-opacity">
+                          <button
+                            onClick={() => setWaReminderTarget(reg)}
+                            className="p-1.5 rounded-lg hover:bg-emerald-50 transition-colors text-emerald-600"
+                            data-testid={`btn-wa-${reg.id}`}
+                            title="Send WhatsApp Due Reminder"
+                          >
+                            <WhatsAppIcon className="w-4 h-4 fill-emerald-600" />
+                          </button>
                           <button onClick={() => setSelectedReg(reg)} className="p-1.5 rounded-lg hover:bg-muted transition-colors text-muted-foreground" data-testid={`btn-view-${reg.id}`} title="View">
                             <Eye className="w-4 h-4" />
                           </button>
@@ -720,6 +730,16 @@ export default function AdminDashboard() {
                   </div>
                 </div>
                 <div className="flex items-center gap-1.5 mt-3 pt-3 border-t border-border">
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className="h-8 px-2 text-xs text-emerald-600 hover:bg-emerald-50"
+                    onClick={() => setWaReminderTarget(reg)}
+                    title="WhatsApp Due Reminder"
+                  >
+                    <WhatsAppIcon className="w-4 h-4 fill-emerald-600 mr-1" />
+                    WhatsApp
+                  </Button>
                   <Button variant="ghost" size="sm" className="flex-1 h-8 text-xs" onClick={() => setSelectedReg(reg)}>
                     <Eye className="w-3.5 h-3.5 mr-1" /> View
                   </Button>
@@ -763,20 +783,31 @@ export default function AdminDashboard() {
           </DialogHeader>
           {selectedReg && <RegistrationDetail reg={selectedReg} />}
           {selectedReg && (
-            <div className="flex gap-2 pt-4 border-t border-border mt-2">
-              {selectedReg.status !== "approved" && (
-                <Button size="sm" className="flex-1 rounded-lg" onClick={() => { handleStatus(selectedReg.id, "approved"); setSelectedReg(null); }} data-testid="btn-detail-approve">
-                  <Check className="w-4 h-4 mr-1" /> Approve
-                </Button>
-              )}
-              {selectedReg.status !== "rejected" && (
-                <Button size="sm" variant="outline" className="flex-1 rounded-lg border-red-200 text-red-600 hover:bg-red-50" onClick={() => { handleStatus(selectedReg.id, "rejected"); setSelectedReg(null); }} data-testid="btn-detail-reject">
-                  <X className="w-4 h-4 mr-1" /> Reject
-                </Button>
-              )}
-              <Button size="sm" variant="destructive" className="rounded-lg" onClick={() => { setDeleteTarget({ id: selectedReg.id, name: selectedReg.fullName }); setSelectedReg(null); }} data-testid="btn-detail-delete">
-                <Trash2 className="w-4 h-4" />
+            <div className="space-y-3 pt-3 border-t border-border mt-2">
+              <Button
+                size="sm"
+                className="w-full bg-[#25D366] hover:bg-[#20bd5a] text-white font-medium rounded-xl gap-2 shadow-sm"
+                onClick={() => {
+                  setWaReminderTarget(selectedReg);
+                }}
+              >
+                <WhatsAppIcon className="w-4 h-4 fill-white" /> Send WhatsApp Due Reminder
               </Button>
+              <div className="flex gap-2">
+                {selectedReg.status !== "approved" && (
+                  <Button size="sm" className="flex-1 rounded-lg" onClick={() => { handleStatus(selectedReg.id, "approved"); setSelectedReg(null); }} data-testid="btn-detail-approve">
+                    <Check className="w-4 h-4 mr-1" /> Approve
+                  </Button>
+                )}
+                {selectedReg.status !== "rejected" && (
+                  <Button size="sm" variant="outline" className="flex-1 rounded-lg border-red-200 text-red-600 hover:bg-red-50" onClick={() => { handleStatus(selectedReg.id, "rejected"); setSelectedReg(null); }} data-testid="btn-detail-reject">
+                    <X className="w-4 h-4 mr-1" /> Reject
+                  </Button>
+                )}
+                <Button size="sm" variant="destructive" className="rounded-lg" onClick={() => { setDeleteTarget({ id: selectedReg.id, name: selectedReg.fullName }); setSelectedReg(null); }} data-testid="btn-detail-delete">
+                  <Trash2 className="w-4 h-4" />
+                </Button>
+              </div>
             </div>
           )}
         </DialogContent>
@@ -806,6 +837,13 @@ export default function AdminDashboard() {
           )}
         </DialogContent>
       </Dialog>
+
+      {/* WhatsApp Reminder Dialog */}
+      <WhatsAppReminderDialog
+        open={!!waReminderTarget}
+        onOpenChange={(o) => !o && setWaReminderTarget(null)}
+        tenant={waReminderTarget}
+      />
 
       {/* Delete Confirmation Dialog */}
       <ConfirmDialog
